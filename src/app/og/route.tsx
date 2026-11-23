@@ -26,12 +26,14 @@ export async function GET(request: Request) {
   let title = url.searchParams.get("title") || "Portfolio";
 
   // Load custom Inter font asset as an ArrayBuffer to render styled text in the image.
+  // Note: @vercel/og (powered by Satori) requires raw ArrayBuffer font data in TTF, OTF, or WOFF format (WOFF2 is unsupported).
   const font = fetch(new URL("../../../public/fonts/Inter.ttf", import.meta.url)).then((res) =>
     res.arrayBuffer(),
   );
   const fontData = await font;
 
   // Render the visual layout to an ImageResponse (PNG) with 1920x1080 resolution.
+  // Satori compiles JSX into SVG before converting to PNG, supporting a strict subset of CSS (primarily Flexbox).
   return new ImageResponse(
     <div
       style={{
@@ -74,7 +76,7 @@ export async function GET(request: Request) {
             gap: "5rem",
           }}
         >
-          {/* Avatar image */}
+          {/* Avatar image - requires an absolute URL with protocol (https://) for ImageResponse / Satori fetching */}
           <img
             src={"https://" + baseURL + person.avatar}
             style={{
